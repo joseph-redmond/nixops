@@ -11,6 +11,7 @@ from typing import Dict, Any, Optional, Callable, List, Union, Iterable, Tuple, 
 
 import nixops.util
 from nixops.logger import MachineLogger
+from security import safe_command
 
 __all__ = ["SSHConnectionFailed", "SSHCommandFailed", "SSH"]
 
@@ -378,7 +379,7 @@ class SSH(object):
                 raise SSHCommandFailed(exc.message, exc.exitcode)
         else:
             check = kwargs.pop("check", True)
-            res = subprocess.call(cmd, **kwargs)
+            res = safe_command.run(subprocess.call, cmd, **kwargs)
             if check and res != 0:
                 msg = "command ‘{0}’ failed on host ‘{1}’"
                 err = msg.format(cmd, self._get_target(user))

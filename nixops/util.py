@@ -40,6 +40,7 @@ from typing import (
 import nixops.util
 from nixops.logger import MachineLogger
 from io import StringIO
+from security import safe_command
 
 
 def shlex_join(split_command: Iterable[str]) -> str:
@@ -271,8 +272,7 @@ def logged_exec(  # noqa: C901
 
     fds: List[IO[str]] = []
     if capture_stdout:
-        process = subprocess.Popen(
-            command,
+        process = safe_command.run(subprocess.Popen, command,
             env=env,
             stdin=passed_stdin,
             stdout=subprocess.PIPE,
@@ -283,8 +283,7 @@ def logged_exec(  # noqa: C901
         fds = [fd for fd in [process.stdout, process.stderr] if fd]
         log_fd_opt = process.stderr
     else:
-        process = subprocess.Popen(
-            command,
+        process = safe_command.run(subprocess.Popen, command,
             env=env,
             stdin=passed_stdin,
             stdout=subprocess.PIPE,

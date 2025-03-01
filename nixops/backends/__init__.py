@@ -22,6 +22,7 @@ from nixops.state import RecordId
 import subprocess
 import threading
 import nixops
+from security import safe_command
 
 
 class KeyOptions(nixops.resources.ResourceOptions):
@@ -413,7 +414,7 @@ class MachineState(
             elif opts.get("keyCommand") is not None:
                 try:
                     with open(tmp, "w+") as f:
-                        subprocess.run(opts["keyCommand"], stdout=f, check=True)
+                        safe_command.run(subprocess.run, opts["keyCommand"], stdout=f, check=True)
                 except subprocess.CalledProcessError:
                     self.warn(f"Running command to generate key '{k}' failed:")
                     raise

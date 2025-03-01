@@ -47,6 +47,7 @@ from nixops.plugins.manager import (
 from nixops.nix_expr import RawValue, Function, Call, nixmerge, py2nix
 from nixops.ansi import ansi_success
 import nixops.evaluation
+from security import safe_command
 
 
 Definitions = Dict[str, nixops.resources.ResourceDefinition]
@@ -1041,8 +1042,7 @@ class Deployment:
                 return
             if m.state != m.STOPPED:
                 ssh_name = m.get_ssh_name()
-                res = subprocess.call(
-                    ["ssh", "root@" + ssh_name] + m.get_ssh_flags() + ["sync"]
+                res = safe_command.run(subprocess.call, ["ssh", "root@" + ssh_name] + m.get_ssh_flags() + ["sync"]
                 )
                 if res != 0:
                     m.logger.log("running sync failed on {0}.".format(m.name))

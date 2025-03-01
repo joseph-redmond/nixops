@@ -31,6 +31,7 @@ from nixops.plugins.manager import PluginManager
 from nixops.plugins import get_plugin_manager
 from nixops.evaluation import eval_network, NetworkEval, NixEvalError, NetworkFile
 from nixops.backends import MachineDefinition
+from security import safe_command
 
 
 PluginManager.load()
@@ -1003,7 +1004,7 @@ def op_scp(args: Namespace) -> None:
         flags = ["scp", "-r"] + m.get_ssh_flags() + [from_loc, to_loc]
         # Map ssh's ‘-p’ to scp's ‘-P’.
         flags = ["-P" if f == "-p" else f for f in flags]
-        res = subprocess.call(flags)
+        res = safe_command.run(subprocess.call, flags)
         sys.exit(res)
 
 
@@ -1027,8 +1028,7 @@ def op_mount(args: Namespace) -> None:
         # Note: sshfs will go into the background when it has finished
         # setting up, so we can safely delete the SSH identity file
         # afterwards.
-        res = subprocess.call(
-            ["sshfs", username + "@" + ssh_name + ":" + remote_path, args.destination]
+        res = safe_command.run(subprocess.call, ["sshfs", username + "@" + ssh_name + ":" + remote_path, args.destination]
             + new_flags
         )
         sys.exit(res)
