@@ -47,9 +47,6 @@ def shlex_join(split_command: Iterable[str]) -> str:
     return " ".join(shlex.quote(arg) for arg in split_command)
 
 
-devnull = open(os.devnull, "r+")
-
-
 def check_wait(
     test: Callable[[], bool],
     initial: int = 10,
